@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "152074233861",
+    "project_id": "alert-sample-799a4",
+    "storage_bucket": "alert-sample-799a4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:152074233861:android:8c499e1163c860bef8546c",
+        "android_client_info": {
+          "package_name": "com.okunev.alertsample"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAt49frCXUihJNoSxPmTKseoDsqr8_3hM4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
