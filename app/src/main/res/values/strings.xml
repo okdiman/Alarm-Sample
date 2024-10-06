@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Alert Sample</string>
+    <string name="alert_turned_off">Alert is turned off</string>
+    <string name="alert_turn_off_text">Stop Alert</string>
+    <string name="token_copied">Token is copied</string>
+    <string name="token_title">Your push token for test:</string>
+    <string name="permission_granted">Granted!</string>
+    <string name="permission_denied">Notifications permission was denied, allow it yourself in the app settings</string>
 </resources>

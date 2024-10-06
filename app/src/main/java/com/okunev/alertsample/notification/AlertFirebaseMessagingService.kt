@@ -3,6 +3,7 @@ package com.okunev.alertsample.notification
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -16,6 +17,7 @@ import org.koin.android.ext.android.inject
 internal class AlertFirebaseMessagingService : FirebaseMessagingService() {
 
     private val alertPlayer by inject<AlertSamplePlayer>()
+    private val dataStore by inject<AlertSampleTokenDataStore>()
 
     override fun onMessageReceived(message: RemoteMessage) {
         alertPlayer.startAlert()
@@ -25,6 +27,7 @@ internal class AlertFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         Log.d("AlertSampleApp", "onNewToken - $token")
+        dataStore.saveToken(token)
         super.onNewToken(token)
     }
 
