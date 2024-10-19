@@ -1,16 +1,14 @@
 package com.okunev.alertsample
 
-import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.pm.PackageManager
-import android.os.Build
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -31,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.okunev.alertsample.drawoverlay.DrawOverlayManager
 import com.okunev.alertsample.notification.AlertSampleTokenDataStore
 import com.okunev.alertsample.player.AlertSamplePlayer
 import kotlinx.coroutines.delay
@@ -40,18 +39,7 @@ internal class MainActivity : ComponentActivity() {
 
     private val alertPlayer by inject<AlertSamplePlayer>()
     private val dataStore by inject<AlertSampleTokenDataStore>()
-
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) showToast(R.string.permission_granted) else showToast(R.string.permission_denied)
-    }
-
-    private fun askNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (checkSelfPermission(POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissionLauncher.launch(POST_NOTIFICATIONS)
-            }
-        }
-    }
+    private val drawOverlayManager by inject<DrawOverlayManager>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +62,12 @@ internal class MainActivity : ComponentActivity() {
                 }
             }
         }
-        askNotificationPermission()
+        if (!drawOverlayManager.isGranted(this)) {
+            drawOverlayManager.request(this)
+        }
+        if (intent.extras?.getBoolean(ALERT_ACTIVE) == true) {
+            alertPlayer.startAlert()
+        }
     }
 
     @Composable
@@ -107,4 +100,12 @@ internal class MainActivity : ComponentActivity() {
     }
 
     private fun showToast(text: Int) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+
+    companion object {
+        private const val ALERT_ACTIVE = "ALERT_ACTIVE"
+        fun alertIntent(context: Context) = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(ALERT_ACTIVE, true)
+        }
+    }
 }

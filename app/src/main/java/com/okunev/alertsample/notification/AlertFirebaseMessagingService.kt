@@ -1,27 +1,22 @@
 package com.okunev.alertsample.notification
 
-import android.annotation.SuppressLint
-import android.app.PendingIntent
-import android.content.Intent
-import android.content.SharedPreferences
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.okunev.alertsample.MainActivity
-import com.okunev.alertsample.R
-import com.okunev.alertsample.player.AlertSamplePlayer
 import org.koin.android.ext.android.inject
 
 internal class AlertFirebaseMessagingService : FirebaseMessagingService() {
 
-    private val alertPlayer by inject<AlertSamplePlayer>()
     private val dataStore by inject<AlertSampleTokenDataStore>()
 
     override fun onMessageReceived(message: RemoteMessage) {
-        alertPlayer.startAlert()
-        showAlertNotification()
+        try {
+            startActivity(MainActivity.alertIntent(this))
+        } catch (e: Exception) {
+            // maybe we don't have permission
+            Log.d("AlertSampleApp", "e - $e")
+        }
         super.onMessageReceived(message)
     }
 
@@ -29,25 +24,5 @@ internal class AlertFirebaseMessagingService : FirebaseMessagingService() {
         Log.d("AlertSampleApp", "onNewToken - $token")
         dataStore.saveToken(token)
         super.onNewToken(token)
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun showAlertNotification() {
-        val intent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, PENDING_INTENT_REQUEST_CODE, intent, PendingIntent.FLAG_IMMUTABLE)
-
-        val notification = NotificationCompat.Builder(this, AlertSampleNotificationChannels.ALARM_CHANNEL_ID)
-            .setContentTitle("You phone is ringing!")
-            .setContentText("Press here to turn off the alarm")
-            .setAutoCancel(true)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentIntent(pendingIntent)
-            .build()
-        NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notification)
-    }
-
-    private companion object {
-        const val PENDING_INTENT_REQUEST_CODE = 7777
-        const val NOTIFICATION_ID = 204
     }
 }
